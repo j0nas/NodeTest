@@ -1,0 +1,69 @@
+extends layout
+block content
+    nav.navbar.navbar-default.navbar-static-top
+        div.container-flud
+            div.navbar-header
+                button.navbar-toggle.collapsed(data-toggle="collapse")
+                a.navbar-brand(href="#")
+                    img(src="favicon.ico", style="display: inline")
+                    span EdYou
+
+            if loggedin == false
+                form.navbar-form.navbar-right#loginform(role="form")
+                    div.form-group
+                        input.form-control#user(type="text", placeholder="Username")
+                        input.form-control#pass(type="password", placeholder="Password")
+                        button.btn.btn-default#loginbtn(type="button") Log in
+                        a(href="/users/new")
+                            button.btn.btn-default#registerbtn(type="button") New user?
+                    script.
+                        // On document ready ..
+                        $(function () {
+                            $("#user").focus();
+                        });
+
+                        $("#loginbtn").click(function () {
+                            $.post('/users/login', {
+                                username: $('#user').val(),
+                                password: $('#pass').val()
+                            }, function (data) {
+                                $("#loginform").fadeOut(function () {
+                                    //$("#loginform").html("Logged in as " + data.username + "&nbsp;&nbsp;&nbsp;&nbsp;").fadeIn();
+                                    $("body").fadeOut('fast', function () {
+                                        location.reload();
+                                    });
+                                });
+                            }).fail(function () {
+                                $("#user").val('Invalid user/pass combo!');
+                            });
+                        });
+            else
+                p.navbar-text Signed in as
+                    span=username
+    div.container
+        div.jumbotron
+            h1 Welcome
+                if loggedin
+                    span=", " + username
+
+        h1 Currently available features
+        ul#links
+            li
+                a(href="/users/") List users
+            li Login
+            li
+                a(href="/users/new") Create user account
+            li Users' passwords are stored and validated with SHA1 encryption
+            li Favicon!
+
+        h1 NPM package dependencies
+        ul#packagedependencies
+            li
+                a(href="https://www.npmjs.com/package/express-session") express-session
+            li
+                a(href="https://www.npmjs.com/package/password-hash") password-hash
+
+        h1 To-do
+        ul
+            li Sessions!
+            li Update package dependencies list?

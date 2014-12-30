@@ -1,0 +1,23 @@
+extends layout
+block content
+    div.container
+        div.jumbotron
+            h1#header Create new user
+            form#usercreate
+                input.form-control#user(type="text", name="username", placeholder="Username")
+                input.form-control#pass(type="password", name="password", placeholder="Password")
+                button.btn.btn-default#submit(type="button") Create account
+
+                script.
+                    $(function () {
+                        $('#submit').click(function () {
+                            $.post('/users/create', {
+                                username: $('#user').val(),
+                                password: $('#pass').val()
+                            }, function (data) {
+                                $("#submit, #header").fadeOut(function () {
+                                    $("#header").html("Success!").fadeIn();
+                                });
+                            });
+                        });
+                    });
