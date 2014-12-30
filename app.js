@@ -51,7 +51,7 @@ db.open(function (err, db) {
     });
 });
 
-// ROUTES
+// POST ROUTES
 app.post('/users/login', function (req, res, next) {
     db.collection('users', function (err, collection) {
         var passHash = require('password-hash');
@@ -65,16 +65,22 @@ app.post('/users/login', function (req, res, next) {
                 return;
             }
 
-            //if () {
-            //    res.status(401).end();
-            //    return;
-            //}
-
             console.log('Login successful for account: ' + JSON.stringify(item));
+            console.log('Session initiated.');
+            req.session.username = item.username;
             res.send(item);
         })
     });
 })
+
+app.post('/users/logout', function (req, res, next) {
+    if (req.session) {
+        req.session.destroy();
+        console.log("Session destroyed.");
+    }
+
+    res.send(200).end();
+});
 
 app.post('/users/create', function (req, res, next) {
     var passHash = require('password-hash');
@@ -92,7 +98,16 @@ app.post('/users/create', function (req, res, next) {
             }
 
             console.log("Successfully created user.");
-            res.send(200);
+            res.send(200).end();
+        });
+    });
+});
+
+// GET ROUTES
+app.get("/users", function (req, res, next) {
+    db.collection('users', function (err, collection) {
+        collection.find().toArray(function (err, items) {
+            res.send(items);
         });
     });
 });

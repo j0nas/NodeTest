@@ -1,11 +1,11 @@
 extends layout
 block content
-    nav.navbar.navbar-default.navbar-static-top
-        div.container-flud
+    nav.navbar.navbar-default
+        div.container-fluid
             div.navbar-header
-                button.navbar-toggle.collapsed(data-toggle="collapse")
+                button.navbar-toggle.collapsed(data-toggle="collapse", type="button")
                 a.navbar-brand(href="#")
-                    img(src="favicon.ico", style="display: inline")
+                    img(src="favicon.ico", style="display: inline; padding-right: 5px")
                     span EdYou
 
             if loggedin == false
@@ -14,8 +14,8 @@ block content
                         input.form-control#user(type="text", placeholder="Username")
                         input.form-control#pass(type="password", placeholder="Password")
                         button.btn.btn-default#loginbtn(type="button") Log in
-                        a(href="/users/new")
-                            button.btn.btn-default#registerbtn(type="button") New user?
+                    a(href="/users/new")
+                        button.btn.btn-default#registerbtn(type="button") New user?
                     script.
                         // On document ready ..
                         $(function () {
@@ -28,7 +28,6 @@ block content
                                 password: $('#pass').val()
                             }, function (data) {
                                 $("#loginform").fadeOut(function () {
-                                    //$("#loginform").html("Logged in as " + data.username + "&nbsp;&nbsp;&nbsp;&nbsp;").fadeIn();
                                     $("body").fadeOut('fast', function () {
                                         location.reload();
                                     });
@@ -38,13 +37,25 @@ block content
                             });
                         });
             else
-                p.navbar-text Signed in as
-                    span=username
+                form.navbar-form.navbar-right(style="margin-right: 10px") Signed in as
+                    span(style="padding-right: 10px")=username
+                    button.btn.btn-default#logoutbtn(type="button") Log out
+                    script.
+                        $("#logoutbtn").click(function () {
+                            $.post('/users/logout', function () {
+                                $("body").fadeOut('fast', function () {
+                                    location.reload();
+                                })
+                            });
+                        });
     div.container
         div.jumbotron
             h1 Welcome
                 if loggedin
-                    span=", " + username
+                    span=", " + username + "!"
+                else
+                    span !
+
 
         h1 Currently available features
         ul#links
@@ -54,7 +65,10 @@ block content
             li
                 a(href="/users/new") Create user account
             li Users' passwords are stored and validated with SHA1 encryption
-            li Favicon!
+            li Favicon
+            li User sessions!
+            li Logout
+            li Somewhat normalized navbar, woo
 
         h1 NPM package dependencies
         ul#packagedependencies
@@ -65,5 +79,12 @@ block content
 
         h1 To-do
         ul
-            li Sessions!
             li Update package dependencies list?
+            li.
+                Figure out resource usage? When to close DB connection, ect.<br>
+                Perhaps this isn't needed - the server instanciates a single connection,
+                and maintains it, no?
+            li Actually start implementing quizes?
+            li Figure out a nice way to refractor
+            li .. additionaly, add proper routes management?
+            li Admin interface/control panel?
