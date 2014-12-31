@@ -22,4 +22,13 @@ router.get('/admin', function (req, res) {
     }
 });
 
+router.get("/users/new", function (req, res, next) {
+    res.render('createaccount', {
+        title: 'Create new user',
+        loggedin: req.session.loggedin == true,
+        username: req.session.username
+    });
+});
+
+
 module.exports = router;

@@ -82,7 +82,7 @@ app.post('/users/logout', function (req, res, next) {
         console.log("Session destroyed.");
     }
 
-    res.status(200).end();
+    res.redirect(200, '/'); // TODO fix redirect to index when logging out
 });
 
 app.post('/users/create', function (req, res, next) {
@@ -142,10 +142,6 @@ app.get("/users", function (req, res, next) {
             res.send(items);
         });
     });
-});
-
-app.get("/users/new", function (req, res, next) {
-    res.render('createaccount');
 });
 
 // catch 404 and forward to error handler
