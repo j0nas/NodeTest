@@ -52,7 +52,8 @@ html
                     form.navbar-form.navbar-right(style="margin-right: 10px") Signed in as&nbsp
                         span(style="padding-right: 10px")=username
                         button.btn.btn-default#logoutbtn(type="button") Log out
-                        script.
+                    script.
+                        $(function () {
                             $("#logoutbtn").click(function () {
                                 $.post('/users/logout', function () {
                                     $("body").fadeOut('fast', function () {
@@ -60,6 +61,7 @@ html
                                     })
                                 });
                             });
+                        });
     div.container
         div.jumbotron
             block jumbotroncontent

@@ -13,12 +13,17 @@ block content
             a(href="/users/") List users
         li
             a(href="/users/new") Create user account
+        li
+            a(href="/admin") Administrator's control panel
         li Login, logout
         li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
         li User sessions!
         li Normalized navbar
         li Favicon
         li 31.12@0242: list users only when logged in
+        li 31.12@0442: Admin control panel!
+        li 31.12@0442: User deletion @ admin CP
+        li 31.12@0512: Deleted user's "delete" buttons fade out @ admin CP
 
     h1 To-do
     ul
@@ -35,6 +40,7 @@ block content
         li Session priviledge checker middleware?
         li More failsafe checks? Is logged in, appropriate privileges..
         li Checks to prevent creating accounts with similar usernames & other sanitation?
+        li Log in with account & start session when created account (redirect?)
 
     h1 NPM package dependencies
     ul#packagedependencies

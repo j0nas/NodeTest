@@ -1,0 +1,31 @@
+extends layout
+if loggedin
+    block jumbotroncontent
+        h1#title Admin's corner
+
+    block content
+        div#userlist
+        script.
+            function deleteQuery(id) {
+                $.post('/users/delete/' + id, function (data) {
+                    console.log("Deleted user with id: " + id);
+                });
+            }
+
+            $.get('/users', function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var container = $("span").attr("id", data[i]._id);
+
+                    var delGlyph = $('<span class="glyphicon glyphicon-remove" aria-hidden="true" style="padding-right: 5px; cursor: pointer;"></span>');
+                    delGlyph.attr("title", data[i]._id)
+                    delGlyph.click(function () {
+                        deleteQuery($(this).attr("title"));
+                        $(this).fadeOut();
+                    });
+
+
+                    var contain = $('<span id="' + data[i]._id + '">');
+                    contain.append(delGlyph).append(JSON.stringify(data[i]) + '<br>');
+                    $('#userlist').append(contain);
+                }
+            });

@@ -110,6 +110,26 @@ app.post('/users/create', function (req, res, next) {
     });
 });
 
+app.post('/users/delete/:id', function (req, res, next) {
+    if (!req.session.loggedin) {
+        res.status(401).end();
+        return;
+    }
+
+    var id = req.params.id;
+    console.log('Deleting user: ' + id);
+    db.collection('users', function (err, collection) {
+        collection.remove({'_id': new BSON.ObjectID(id)}, {safe: true}, function (err, result) {
+            if (err) {
+                res.send({'error': 'An error has occurred - ' + err});
+            } else {
+                console.log('' + result + ' document(s) deleted');
+                res.send(req.body);
+            }
+        });
+    });
+});
+
 // GET ROUTES
 app.get("/users", function (req, res, next) {
     if (!req.session.loggedin) {
