@@ -1,93 +1,44 @@
 extends layout
+block jumbotroncontent
+    h1 Welcome
+        if loggedin
+            span=", " + username + "!"
+        else
+            span !
+
 block content
-    nav.navbar.navbar-default
-        div.container-fluid
-            div.navbar-header
-                button.navbar-toggle.collapsed(data-toggle="collapse", type="button")
-                a.navbar-brand(href="#")
-                    img(src="favicon.ico", style="display: inline; padding-right: 5px")
-                    span EdYou
+    h1 Currently available features
+    ul#links
+        li
+            a(href="/users/") List users
+        li
+            a(href="/users/new") Create user account
+        li Login, logout
+        li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
+        li User sessions!
+        li Normalized navbar
+        li Favicon
+        li 31.12@0242: list users only when logged in
 
-            if loggedin == false
-                form.navbar-form.navbar-right#loginform(role="form")
-                    div.form-group
-                        input.form-control#user(type="text", placeholder="Username")
-                        input.form-control#pass(type="password", placeholder="Password")
-                        button.btn.btn-default#loginbtn(type="button") Log in
-                    a(href="/users/new")
-                        button.btn.btn-default#registerbtn(type="button") New user?
-                    script.
-                        // On document ready ..
-                        $(function () {
-                            $("#user").focus();
-                        });
+    h1 To-do
+    ul
+        li Update package dependencies list?
+        li.
+            Figure out resource usage? When to close DB connection, ect.<br>
+            Perhaps this isn't needed - the server instanciates a single connection,
+            and maintains it, no?
+        li Actually start implementing quizes?
+        li Figure out a nice way to refractor
+        li .. additionaly, add proper routes management?
+        li Admin interface/control panel?
+        li List of users only available if loggedin
+        li Session priviledge checker middleware?
+        li More failsafe checks? Is logged in, appropriate privileges..
+        li Checks to prevent creating accounts with similar usernames & other sanitation?
 
-                        $("#loginbtn").click(function () {
-                            $.post('/users/login', {
-                                username: $('#user').val(),
-                                password: $('#pass').val()
-                            }, function (data) {
-                                $("#loginform").fadeOut(function () {
-                                    $("body").fadeOut('fast', function () {
-                                        location.reload();
-                                    });
-                                });
-                            }).fail(function () {
-                                $("#user").val('Invalid user/pass combo!');
-                            });
-                        });
-            else
-                form.navbar-form.navbar-right(style="margin-right: 10px") Signed in as&nbsp
-                    span(style="padding-right: 10px")=username
-                    button.btn.btn-default#logoutbtn(type="button") Log out
-                    script.
-                        $("#logoutbtn").click(function () {
-                            $.post('/users/logout', function () {
-                                $("body").fadeOut('fast', function () {
-                                    location.reload();
-                                })
-                            });
-                        });
-    div.container
-        div.jumbotron
-            h1 Welcome
-                if loggedin
-                    span=", " + username + "!"
-                else
-                    span !
-
-
-        h1 Currently available features
-        ul#links
-            li
-                a(href="/users/") List users
-            li
-                a(href="/users/new") Create user account
-            li Login, logout
-            li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
-            li User sessions!
-            li Normalized navbar
-            li Favicon
-            li 31.12@0242: list users only when logged in
-
-        h1 To-do
-        ul
-            li Update package dependencies list?
-            li.
-                Figure out resource usage? When to close DB connection, ect.<br>
-                Perhaps this isn't needed - the server instanciates a single connection,
-                and maintains it, no?
-            li Actually start implementing quizes?
-            li Figure out a nice way to refractor
-            li .. additionaly, add proper routes management?
-            li Admin interface/control panel?
-            li List of users only available if loggedin
-            li Session priviledge checker middleware?
-            li More failsafe checks? Is logged in, appropriate privileges..
-
-        h1 NPM package dependencies
-        ul#packagedependencies
-            li
-                a(href="https://www.npmjs.com/package/express-session") express-session
-            li
-                a(href="https://www.npmjs.com/package/password-hash") password-hash
+    h1 NPM package dependencies
+    ul#packagedependencies
+        li
+            a(href="https://www.npmjs.com/package/express-session") express-session
+        li
+            a(href="https://www.npmjs.com/package/password-hash") password-hash

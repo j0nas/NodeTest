@@ -12,4 +12,56 @@ html
 
         //link(rel='stylesheet', href='/stylesheets/style.css')
     body(role="document")
+        nav.navbar.navbar-default
+            div.container-fluid
+                div.navbar-header
+                    button.navbar-toggle.collapsed(data-toggle="collapse", type="button")
+                    a.navbar-brand(href="/")
+                        img(src="../favicon.ico", style="display: inline; padding-right: 5px")
+                        span EdYou
+
+                if loggedin == false
+                    form.navbar-form.navbar-right#loginform(role="form")
+                        div.form-group
+                            input.form-control#user(type="text", placeholder="Username")
+                            input.form-control#pass(type="password", placeholder="Password")
+                            button.btn.btn-default#loginbtn(type="button") Log in
+                        a(href="/users/new")
+                            button.btn.btn-default#registerbtn(type="button") New user?
+                        script.
+                            // On document ready ..
+                            $(function () {
+                                $("#user").focus();
+                            });
+
+                            $("#loginbtn").click(function () {
+                                $.post('/users/login', {
+                                    username: $('#user').val(),
+                                    password: $('#pass').val()
+                                }, function (data) {
+                                    $("#loginform").fadeOut(function () {
+                                        $("body").fadeOut('fast', function () {
+                                            location.reload();
+                                        });
+                                    });
+                                }).fail(function () {
+                                    $("#user").val('Invalid user/pass combo!');
+                                });
+                            });
+                else
+                    form.navbar-form.navbar-right(style="margin-right: 10px") Signed in as&nbsp
+                        span(style="padding-right: 10px")=username
+                        button.btn.btn-default#logoutbtn(type="button") Log out
+                        script.
+                            $("#logoutbtn").click(function () {
+                                $.post('/users/logout', function () {
+                                    $("body").fadeOut('fast', function () {
+                                        location.reload();
+                                    })
+                                });
+                            });
+    div.container
+        div.jumbotron
+            block jumbotroncontent
+
         block content
