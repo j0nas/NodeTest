@@ -53,10 +53,12 @@ db.open(function (err, db) {
 
 // POST ROUTES
 app.post('/users/login', function (req, res, next) {
+    if (req.session.loggedin) {
+        return;
+    }
+
     db.collection('users', function (err, collection) {
         var passHash = require('password-hash');
-        console.log(passHash.generate(req.body.password));
-        console.log(passHash.generate(req.body.password));
         collection.findOne({
             'username': req.body.username
         }, function (err, item) {
@@ -68,21 +70,26 @@ app.post('/users/login', function (req, res, next) {
             console.log('Login successful for account: ' + JSON.stringify(item));
             console.log('Session initiated.');
             req.session.username = item.username;
+            req.session.loggedin = true;
             res.send(item);
         })
     });
 })
 
 app.post('/users/logout', function (req, res, next) {
-    if (req.session) {
+    if (req.session.loggedin) {
         req.session.destroy();
         console.log("Session destroyed.");
     }
 
-    res.send(200).end();
+    res.status(200).end();
 });
 
 app.post('/users/create', function (req, res, next) {
+    if (typeof req.body == "undefined") {
+        return;
+    }
+
     var passHash = require('password-hash');
     var user = {
         username: req.body.username,
@@ -98,13 +105,18 @@ app.post('/users/create', function (req, res, next) {
             }
 
             console.log("Successfully created user.");
-            res.send(200).end();
+            res.status(200).end();
         });
     });
 });
 
 // GET ROUTES
 app.get("/users", function (req, res, next) {
+    if (!req.session.loggedin) {
+        res.status(401).end();
+        return;
+    }
+
     db.collection('users', function (err, collection) {
         collection.find().toArray(function (err, items) {
             res.send(items);
