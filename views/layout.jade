@@ -7,6 +7,13 @@ html
         meta(name='viewport', content='width=device-width, initial-scale=1.0')
 
         link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
+        //link(rel='stylesheet', href='http://bootswatch.com/cyborg/bootstrap.min.css')
+        //link(rel='stylesheet', href='http://bootswatch.com/darkly/bootstrap.min.css')
+        //link(rel='stylesheet', href='http://bootswatch.com/superhero/bootstrap.min.css')
+        //link(rel='stylesheet', href='http://bootswatch.com/yeti/bootstrap.min.css')
+        link(rel='stylesheet', href='http://bootswatch.com/slate/bootstrap.min.css')
+        // ^Amazing themes, check them out!
+
         script(src='//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js')
         script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
 
@@ -33,8 +40,8 @@ html
                     if !loggedin
                         form.navbar-form.navbar-right#loginform(role="form")
                             div.form-group
-                                input.form-control#user(type="text", placeholder="Username", autofocus)
-                                input.form-control#pass(type="password", placeholder="Password")
+                                input.form-control#user(type="text", placeholder="Username", autofocus, style="margin-right: 5px")
+                                input.form-control#pass(type="password", placeholder="Password", style="margin-right: 5px")
                             div.btn-group
                                 button.btn.btn-default#loginbtn(type="button") Log in
                                 button.btn.btn-default#registerbtn(type="button") New user?
