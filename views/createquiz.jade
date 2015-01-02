@@ -1,6 +1,6 @@
 extends layout
 block jumbotroncontent
-    h1 Create new quiz
+    h1#title Create new quiz
 
 block content
     p
@@ -9,7 +9,7 @@ block content
                 input.form-control#quizname(type="text", placeholder="Quiz name")
     div#questioncontainer
     p
-        div.btn-group(role="group")
+        div.btn-group#finalize(role="group")
             button.btn.btn-primary#newquestion Add question
             button.btn.btn-default#savequiz Save quiz
 
@@ -62,13 +62,13 @@ block content
             addQuestion();
         });
 
-        //$('#saveandnewquestion').click(function () {}); TODO IMPLEMENT
-
         $('#newquestion').click(function () {
             addQuestion();
         });
 
         $('#savequiz').click(function () {
+            $('#finalize').fadeOut('fast');
+
             var quiz = {
                 name: $('#quizname').val(),
                 author: "",
@@ -90,8 +90,10 @@ block content
                 }
             }
 
-            console.log("Attempting to persist created quiz: " + JSON.stringify(quiz));
-            $.post('/quiz/new', quiz, function (data) {
-                // Check if it succeeded.
+            console.log("Attempting to persist created quiz.");
+            $.post('/quiz/new', quiz, function () {
+                $('#title').fadeOut('fast', function () {
+                    $('#title').html("Successfully saved quiz").fadeIn('fast');
+                })
             });
         });

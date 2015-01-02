@@ -28,7 +28,7 @@ block content
         li 31.12@0512: Deleted user's "delete" buttons fade out @ admin CP
         li 31.12@0549: Correct handling of loggedin status for 404 pages, ect. Shows back button.
         li 02.01@0152: Front end for creating quizes
-        li 02.01@0419: Creating, persisting quizes!
+        li 02.01@0419: Creating and persisting quizes!
 
     h1 To-do
     ul
@@ -37,15 +37,15 @@ block content
             Figure out resource usage? When to close DB connection, ect.<br>
             Perhaps this isn't needed - the server instanciates a single connection,
             and maintains it, no?
-        li Actually start implementing quizes?
         li Figure out a nice way to refractor
-        li .. additionaly, add proper routes management?
-        li Admin interface/control panel?
-        li List of users only available if loggedin
-        li Session priviledge checker middleware?
+        li Proper routes management
+        li Session priviledge checker middleware
         li More failsafe checks? Is logged in, appropriate privileges..
         li Checks to prevent creating accounts with similar usernames & other sanitation?
         li Log in with account & start session when created account (redirect?)
+        li "Forgot password?" option
+        li Actually display 401 error messages
+        li Users able to take quizes
 
     h1 NPM package dependencies
     ul#packagedependencies

@@ -35,10 +35,14 @@ html
                             div.form-group
                                 input.form-control#user(type="text", placeholder="Username", autofocus)
                                 input.form-control#pass(type="password", placeholder="Password")
+                            div.btn-group
                                 button.btn.btn-default#loginbtn(type="button") Log in
-                            a(href="/users/new")
                                 button.btn.btn-default#registerbtn(type="button") New user?
                             script.
+                                $("#registerbtn").click(function () {
+                                    document.location = "/users/new";
+                                });
+
                                 $("#loginbtn").click(function () {
                                     $.post('/users/login', {
                                         username: $('#user').val(),
