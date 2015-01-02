@@ -8,6 +8,7 @@ block jumbotroncontent
 
 block content
     h1 Currently available features
+    h4 (Must be signed in.)
     ul#links
         li
             a(href="/users/") List users
@@ -17,6 +18,9 @@ block content
             a(href="/admin") Administrator's control panel
         li
             a(href="/quiz/new") Create a new quiz
+        li
+            a(href="/quiz/") List available quizes
+        li &nbsp;
         li Login, logout
         li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
         li User sessions!
@@ -29,6 +33,11 @@ block content
         li 31.12@0549: Correct handling of loggedin status for 404 pages, ect. Shows back button.
         li 02.01@0152: Front end for creating quizes
         li 02.01@0419: Creating and persisting quizes!
+        li 02.01@sometimeidon'tevenremember: Listing quizes
+        li 02.01@0521: Themes
+        li 02.01@1431: Proper JSON formatting (json spaces = 4)
+        li 02.01@1540: Tables @ admin CP - formatting and parsing using Bootstrap Table (WHICH IS AN AMAZING LIBRARY!)
+        li 02.01@1613: Delete quizes and users from admin cp GUI!
 
     h1 To-do
     ul
@@ -39,13 +48,15 @@ block content
             and maintains it, no?
         li Figure out a nice way to refractor
         li Proper routes management
-        li Session priviledge checker middleware
+        li Session privilege checker middleware
         li More failsafe checks? Is logged in, appropriate privileges..
         li Checks to prevent creating accounts with similar usernames & other sanitation?
         li Log in with account & start session when created account (redirect?)
         li "Forgot password?" option
         li Actually display 401 error messages
         li Users able to take quizes
+        li navbar with links, dynamically loaded according to user privilege
+
 
     h1 NPM package dependencies
     ul#packagedependencies
@@ -53,3 +64,8 @@ block content
             a(href="https://www.npmjs.com/package/express-session") express-session
         li
             a(href="https://www.npmjs.com/package/password-hash") password-hash
+
+    h1 Other dependencies
+    ul#otherdependencies
+        li
+            a(href="http://wenzhixin.net.cn/p/bootstrap-table/docs/") Bootstrap Table

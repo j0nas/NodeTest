@@ -29,6 +29,7 @@ app.use(expressSession({
 }));
 
 app.use('/', routes);
+app.set('json spaces', 4);
 
 var mongo = require('mongodb');
 var Server = mongo.Server;
@@ -154,6 +155,26 @@ app.post('/quiz/new', function (req, res, next) {
     });
 });
 
+app.post('/quiz/delete/:id', function (req, res, next) {
+    if (!req.session.loggedin) {
+        res.status(401).end();
+        return;
+    }
+
+    var id = req.params.id;
+    console.log('Deleting quiz: ' + id);
+    db.collection('quiz', function (err, collection) {
+        collection.remove({'_id': new BSON.ObjectID(id)}, {safe: true}, function (err, result) {
+            if (err) {
+                res.send({'error': 'An error has occurred - ' + err});
+            } else {
+                console.log('' + result + ' document(s) deleted');
+                res.send(req.body);
+            }
+        });
+    });
+});
+
 // GET ROUTES
 app.get("/users", function (req, res, next) {
     if (!req.session.loggedin) {
@@ -163,7 +184,7 @@ app.get("/users", function (req, res, next) {
 
     db.collection('users', function (err, collection) {
         collection.find().toArray(function (err, items) {
-            res.send(items);
+            res.json(items);
         });
     });
 });

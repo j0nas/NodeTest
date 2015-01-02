@@ -6,27 +6,39 @@ if loggedin
     block content
         h1 Registered users
         div#userlist
+            table#quiztable(data-url='/users', data-toggle='table')
+                thead
+                    tr
+                        th(data-field="_id") Id
+                        th(data-field="username") Username
+                        th(data-field="password") Password
+                        th(data-field="operate", data-formatter="operateFormatter" data-events="operateEvents") Operations
+
         script.
-            function deleteQuery(id) {
-                $.post('/users/delete/' + id, function (data) {
-                    console.log("Deleted user with id: " + id);
-                });
+            function operateFormatter(value, row, index) {
+                return [
+                    '<a class="remove ml10" href="javascript:void(0)" title="Remove">',
+                    '<i class="glyphicon glyphicon-remove"></i>',
+                    '</a>'
+                ].join('');
             }
 
-            $.get('/users', function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var container = $("span").attr("id", data[i]._id);
-
-                    var delGlyph = $('<span class="glyphicon glyphicon-remove" aria-hidden="true" style="padding-right: 5px; cursor: pointer;"></span>');
-                    delGlyph.attr("title", data[i]._id)
-                    delGlyph.click(function () {
-                        deleteQuery($(this).attr("title"));
-                        $(this).fadeOut();
+            window.operateEvents = {
+                'click .remove': function (e, value, row, index) {
+                    var type = (typeof row.author === 'undefined' ? 'users' : 'quiz');
+                    $.post('/' + type + '/delete/' + row._id, function (data) {
+                        console.log('Deleted ' + type + ' with id: ' + row._id);
+                        $('#' + row._id).fadeOut();
                     });
-
-
-                    var contain = $('<span id="' + data[i]._id + '">');
-                    contain.append(delGlyph).append(JSON.stringify(data[i]) + '<br>');
-                    $('#userlist').append(contain);
                 }
-            });
+            };
+
+        h1 Quizes
+        div#quizlist
+            table#quiztable(data-url='/quiz', data-toggle='table')
+                thead
+                    tr
+                        th(data-field="name") Name
+                        th(data-field="author") Author
+                        th(data-field="questioncount") Questions
+                        th(data-field="operate", data-formatter="operateFormatter" data-events="operateEvents") Operations
