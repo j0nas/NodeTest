@@ -1,0 +1,89 @@
+extends layout
+block jumbotroncontent
+    h1 Create new quiz
+
+block content
+    p
+        div.row
+            div.col-md-5
+                input.form-control#quizname(type="text", placeholder="Quiz name")
+
+    div.row
+        div.col-md-5
+            div.panel.panel-default
+                div.panel-heading
+                    input.form-control#question(placeholder="Question")
+                div.panel-body
+                    div.input-group
+                        span.input-group-addon
+                            input(type="checkbox")
+                        input.form-control(type="text" class="form-control", placeholder="Answer alternative #1")
+                    div.input-group
+                        span.input-group-addon
+                            input(type="checkbox")
+                        input.form-control(type="text" class="form-control", placeholder="Answer alternative #2")
+
+    p
+        div.btn-group(role="group")
+            button.btn.btn-primary#addanswer Add answer
+            button.btn.btn-default#removeanswer Remove answer
+            button.btn.btn-default#saveandnewquestion Save & next question
+            button.btn.btn-default#savequiz Save & exit quiz
+
+    script.
+        var answerCount = 0;
+        function addRadioAnswer() {
+            var questionContainer = document.createElement('div');
+            questionContainer.setAttribute('id', 'radioquestion_' + ++answerCount);
+            $('#questions').append($(questionContainer));
+            var radioAnswer = document.createElement('input');
+            radioAnswer.setAttribute('type', 'radio');
+            radioAnswer.setAttribute('id', 'ans_opt' + answerCount);
+            radioAnswer.setAttribute('name', 'ans');
+            $('#radioquestion_' + answerCount).append($(radioAnswer));
+            var label = '<label for="ans_opt' + answerCount + '">' +
+                    '<input type="text" placeholder="Svaralternativ:" id="ans_val' + answerCount + '">' +
+                    '</label>';
+            $('#radioquestion_' + answerCount).append($(label));
+            $('#removeanswer').prop('disabled', answerCount < 3);
+        }
+
+        // Wait for DOM ready, then add initial question.
+        $(function () {
+            addRadioAnswer();
+            addRadioAnswer();
+        });
+
+        $('#removeanswer').click(function () {
+            $('#radioquestion_' + answerCount--).remove();
+            $('#removeanswer').prop('disabled', answerCount < 3);
+        });
+
+        $('#addanswer').click(function () {
+            addRadioAnswer();
+        });
+
+        //$('#saveandnewquestion').click(function () {}); TODO IMPLEMENT
+
+        $('#savequiz').click(function () {
+            var quiz = {
+                name: $('#quizname').val(),
+                questioncount: answerCount,
+                questions: [{
+                    text: $('#question').val(),
+                    answers: []
+                }]
+            };
+
+            for (var i = 1; i < answerCount + 1; i++) {
+                quiz.questions[0].answers.push({
+                    text: $('#ans_val' + i).val(),
+                    iscorrect: false
+                });
+            }
+
+            console.log("Attempting to persist created quiz: " + JSON.stringify(quiz));
+            $.post('/quiz/savetodb', quiz, function (data) {
+                // Check if it succeeded.
+            });
+        });
