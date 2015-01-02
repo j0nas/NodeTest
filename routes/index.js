@@ -37,6 +37,7 @@ router.get('/quiz/new', function (req, res, next) {
     }
 
     res.render('createquiz', {
+        title: 'Create new quiz',
         loggedin: true,
         username: req.session.username
     });

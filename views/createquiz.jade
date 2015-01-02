@@ -7,83 +7,91 @@ block content
         div.row
             div.col-md-5
                 input.form-control#quizname(type="text", placeholder="Quiz name")
-
-    div.row
-        div.col-md-5
-            div.panel.panel-default
-                div.panel-heading
-                    input.form-control#question(placeholder="Question")
-                div.panel-body
-                    div.input-group
-                        span.input-group-addon
-                            input(type="checkbox")
-                        input.form-control(type="text" class="form-control", placeholder="Answer alternative #1")
-                    div.input-group
-                        span.input-group-addon
-                            input(type="checkbox")
-                        input.form-control(type="text" class="form-control", placeholder="Answer alternative #2")
-
+    div#questioncontainer
     p
         div.btn-group(role="group")
-            button.btn.btn-primary#addanswer Add answer
-            button.btn.btn-default#removeanswer Remove answer
-            button.btn.btn-default#saveandnewquestion Save & next question
-            button.btn.btn-default#savequiz Save & exit quiz
+            button.btn.btn-primary#newquestion Add question
+            button.btn.btn-default#savequiz Save quiz
 
     script.
-        var answerCount = 0;
-        function addRadioAnswer() {
-            var questionContainer = document.createElement('div');
-            questionContainer.setAttribute('id', 'radioquestion_' + ++answerCount);
-            $('#questions').append($(questionContainer));
-            var radioAnswer = document.createElement('input');
-            radioAnswer.setAttribute('type', 'radio');
-            radioAnswer.setAttribute('id', 'ans_opt' + answerCount);
-            radioAnswer.setAttribute('name', 'ans');
-            $('#radioquestion_' + answerCount).append($(radioAnswer));
-            var label = '<label for="ans_opt' + answerCount + '">' +
-                    '<input type="text" placeholder="Svaralternativ:" id="ans_val' + answerCount + '">' +
-                    '</label>';
-            $('#radioquestion_' + answerCount).append($(label));
-            $('#removeanswer').prop('disabled', answerCount < 3);
+        var questionCount = 0;
+        var answerCount = [];
+
+        function addAnswerAlternative(questionId) {
+            $('#question_' + questionId + '_answers').append('<div id="question_' + questionId + '_answer_' + ++answerCount[questionId] + '"></div>'); // TODO null-index answers!
+            $('#question_' + questionId + '_answer_' + answerCount[questionId] + ' ').append(
+                    '<div class="input-group">' +
+                    '<span class="input-group-addon">' +
+                    '<input type="checkbox">' +
+                    '</span>' +
+                    '<input class="form-control" type="text" placeholder="Answer alternative #' + answerCount[questionId] + '">' +
+                    '</div>');
+
+            $('#removeanswer_' + questionId).prop('disabled', answerCount[questionId] < 3);
         }
 
-        // Wait for DOM ready, then add initial question.
+        function removeAnswerAlternative(questionId) {
+            $('#question_' + questionId + '_answer_' + answerCount[questionId]).remove();
+            $('#removeanswer_' + questionId).prop('disabled', --answerCount[questionId] < 3);
+        }
+
+        function addQuestion() {
+            $("#questioncontainer").append(
+                    '<div class="row">' +
+                    '<div class="col-md-5">' +
+                    '<div class="panel panel-default">' +
+                    '<div class="panel-heading">' +
+                    '<input id="question_' + questionCount + '" placeholder="Question" class="form-control">' +
+                    '</div>' +
+                    '<div id="question_' + questionCount + '_answers" class="panel-body"></div>' +
+                    '<div class="panel-footer">' +
+                    '<div role="group" class="btn-group">' +
+                    '<button class="btn btn-primary" onclick="addAnswerAlternative(' + questionCount + ');">Add answer</button>' +
+                    '<button id="removeanswer_' + questionCount + '" class="btn btn-default" onclick="removeAnswerAlternative(' + questionCount + ')">Remove answer</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>');
+
+            answerCount.push(0);
+            addAnswerAlternative(questionCount);
+            addAnswerAlternative(questionCount);
+            questionCount++;
+        }
+
         $(function () {
-            addRadioAnswer();
-            addRadioAnswer();
-        });
-
-        $('#removeanswer').click(function () {
-            $('#radioquestion_' + answerCount--).remove();
-            $('#removeanswer').prop('disabled', answerCount < 3);
-        });
-
-        $('#addanswer').click(function () {
-            addRadioAnswer();
+            addQuestion();
         });
 
         //$('#saveandnewquestion').click(function () {}); TODO IMPLEMENT
 
+        $('#newquestion').click(function () {
+            addQuestion();
+        });
+
         $('#savequiz').click(function () {
             var quiz = {
                 name: $('#quizname').val(),
-                questioncount: answerCount,
-                questions: [{
-                    text: $('#question').val(),
-                    answers: []
-                }]
+                author: "",
+                questioncount: questionCount,
+                questions: []
             };
 
-            for (var i = 1; i < answerCount + 1; i++) {
-                quiz.questions[0].answers.push({
-                    text: $('#ans_val' + i).val(),
-                    iscorrect: false
+            for (var i = 0; i < questionCount; i++) {
+                quiz.questions.push({
+                    text: $('#question_' + i).val(),
+                    answers: []
                 });
+
+                for (j = 1; j < answerCount[i] + 1; j++) { // TODO instead of this hack, implement actual null-indexing
+                    quiz.questions[i].answers.push({
+                        text: $('#question_' + i + '_answer_' + j + ' > div > input').val(),
+                        iscorrect: $('#question_' + i + '_answer_' + j + ' > div > span > input').prop('checked'),
+                    });
+                }
             }
 
             console.log("Attempting to persist created quiz: " + JSON.stringify(quiz));
-            $.post('/quiz/savetodb', quiz, function (data) {
+            $.post('/quiz/new', quiz, function (data) {
                 // Check if it succeeded.
             });
         });
