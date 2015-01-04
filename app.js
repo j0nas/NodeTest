@@ -149,8 +149,8 @@ app.post('/quiz/new', function (req, res, next) {
                 return;
             }
 
-            console.log("Successfully persisted quiz."); // TODO are the quizes persisted correctly?
-            res.status(200).end();                       // I guess I'll find out when parsing them.
+            console.log("Successfully persisted quiz.");
+            res.status(200).end();
         });
     });
 });
@@ -199,6 +199,69 @@ app.get("/quiz", function (req, res, next) {
         collection.find().toArray(function (err, items) {
             res.send(items);
         });
+    });
+});
+
+app.get('/quiznew', function (req, res, next) {
+    console.log("Accessing!");
+
+    db.collection('quiz', function (err, collection) {
+        collection.insert({
+            name: "testquiz",
+            author: "user",
+            questions: [{
+                text: "question one",
+                answers: [
+                    {
+                        text: "answer one",
+                        correct: false
+                    },
+                    {
+                        text: "answer two",
+                        correct: true
+                    }]
+            },
+                {
+                    text: "question twp",
+                    answers: [
+                        {
+                            text: "answer one",
+                            correct: true
+                        },
+                        {
+                            text: "answer two",
+                            correct: false
+                        }]
+                }]
+        }, {safe: true}, function (err, result) {
+            if (err) {
+                res.send({'error': 'An error has occurred'});
+                return;
+            }
+
+            console.log("Successfully persisted quiz.");
+            res.status(200).end();
+        });
+    });
+});
+
+app.get('/quiz/activate/:id', function (req, res, next) {
+    db.collection('quiz', function (err, collection) {
+        collection.findOne({
+            '_id': new BSON.ObjectID(req.params.id)
+        }, function (err, item) {
+            if (err || item == null) {
+                res.status(404).end();
+                return;
+            }
+
+            console.log('Successfully found quiz' + JSON.stringify(item));
+            res.render('quiz', {
+                name: item.name,
+                author: item.author,
+                questions: JSON.stringify(item.questions)
+            });
+        })
     });
 });
 

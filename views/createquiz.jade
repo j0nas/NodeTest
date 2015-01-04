@@ -77,13 +77,13 @@ block content
             };
 
             for (var i = 0; i < questionCount; i++) {
-                quiz.questions.push({
+                quiz.questions.push(new {
                     text: $('#question_' + i).val(),
                     answers: []
                 });
 
                 for (j = 1; j < answerCount[i] + 1; j++) { // TODO instead of this hack, implement actual null-indexing
-                    quiz.questions[i].answers.push({
+                    quiz.questions[i].answers.push(new {
                         text: $('#question_' + i + '_answer_' + j + ' > div > input').val(),
                         iscorrect: $('#question_' + i + '_answer_' + j + ' > div > span > input').prop('checked'),
                     });
