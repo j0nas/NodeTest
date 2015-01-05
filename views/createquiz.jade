@@ -3,36 +3,37 @@ block jumbotroncontent
     h1#title Create new quiz
 
 block content
-    p
-        div.row
-            div.col-md-5
-                input.form-control#quizname(type="text", placeholder="Quiz name")
-    div#questioncontainer
-    p
-        div.btn-group#finalize(role="group")
-            button.btn.btn-primary#newquestion Add question
-            button.btn.btn-default#savequiz Save quiz
+    form#questionform(action='/quiz/new', method='POST', enctype='application/json')
+        p
+            input.form-control#quizname(name="quizname", type="text", placeholder="Quiz name")
+        p#questioncontainer
+        p
+            div.btn-group#finalize(role="group")
+                button.btn.btn-primary#newquestion Add question
+                button.btn.btn-default#savequiz(type='submit') Save quiz
 
     script.
         var questionCount = 0;
         var answerCount = [];
 
         function addAnswerAlternative(questionId) {
-            $('#question_' + questionId + '_answers').append('<div id="question_' + questionId + '_answer_' + ++answerCount[questionId] + '"></div>'); // TODO null-index answers!
+            $('#question_' + questionId + '_answers').append('<div id="question_' + questionId + '_answer_' + answerCount[questionId] + '"></div>');
             $('#question_' + questionId + '_answer_' + answerCount[questionId] + ' ').append(
                     '<div class="input-group">' +
                     '<span class="input-group-addon">' +
-                    '<input type="checkbox">' +
+                    '<input type="checkbox" name="questions[' + questionId + '][answers][' + answerCount[questionId] + '][iscorrect]">' +
                     '</span>' +
-                    '<input class="form-control" type="text" placeholder="Answer alternative #' + answerCount[questionId] + '">' +
+                    '<input type="text" name="questions[' + questionId + '][answers][' + answerCount[questionId] +
+                    '][text]" class="form-control" placeholder="Answer alternative #' + (answerCount[questionId] + 1) + '">' +
                     '</div>');
 
+            answerCount[questionId]++;
             $('#removeanswer_' + questionId).prop('disabled', answerCount[questionId] < 3);
         }
 
         function removeAnswerAlternative(questionId) {
-            $('#question_' + questionId + '_answer_' + answerCount[questionId]).remove();
-            $('#removeanswer_' + questionId).prop('disabled', --answerCount[questionId] < 3);
+            $('#question_' + questionId + '_answer_' + --answerCount[questionId]).remove();
+            $('#removeanswer_' + questionId).prop('disabled', answerCount[questionId] < 3);
         }
 
         function addQuestion() {
@@ -41,13 +42,13 @@ block content
                     '<div class="col-md-5">' +
                     '<div class="panel panel-default">' +
                     '<div class="panel-heading">' +
-                    '<input id="question_' + questionCount + '" placeholder="Question" class="form-control">' +
+                    '<input id="question_' + questionCount + '" name="questions[' + questionCount + '][text]" placeholder="Question" class="form-control">' +
                     '</div>' +
                     '<div id="question_' + questionCount + '_answers" class="panel-body"></div>' +
                     '<div class="panel-footer">' +
                     '<div role="group" class="btn-group">' +
-                    '<button class="btn btn-primary" onclick="addAnswerAlternative(' + questionCount + ');">Add answer</button>' +
-                    '<button id="removeanswer_' + questionCount + '" class="btn btn-default" onclick="removeAnswerAlternative(' + questionCount + ')">Remove answer</button>' +
+                    '<button class="btn btn-primary" onclick="addAnswerAlternative(' + questionCount + '); return false;">Add answer</button>' +
+                    '<button id="removeanswer_' + questionCount + '" class="btn btn-default" onclick="removeAnswerAlternative(' + questionCount + '); return false;">Remove answer</button>' +
                     '</div>' +
                     '</div>' +
                     '</div>');
@@ -64,36 +65,37 @@ block content
 
         $('#newquestion').click(function () {
             addQuestion();
+            return false;
         });
 
         $('#savequiz').click(function () {
-            $('#finalize').fadeOut('fast');
-
-            var quiz = {
-                name: $('#quizname').val(),
+            obj = {
+                quizname: $('#quizname').val(),
                 author: "",
-                questioncount: questionCount,
                 questions: []
             };
 
             for (var i = 0; i < questionCount; i++) {
-                quiz.questions.push(new {
+                obj.questions.push({
                     text: $('#question_' + i).val(),
                     answers: []
                 });
 
-                for (j = 1; j < answerCount[i] + 1; j++) { // TODO instead of this hack, implement actual null-indexing
-                    quiz.questions[i].answers.push(new {
+                for (var j = 0; j < answerCount[i]; j++) {
+                    obj.questions[i].answers.push({
                         text: $('#question_' + i + '_answer_' + j + ' > div > input').val(),
-                        iscorrect: $('#question_' + i + '_answer_' + j + ' > div > span > input').prop('checked'),
+                        correct: $('#question_' + i + '_answer_' + j + ' > div > span > input[type="checkbox"]').is(':checked')
                     });
                 }
             }
 
-            console.log("Attempting to persist created quiz.");
-            $.post('/quiz/new', quiz, function () {
-                $('#title').fadeOut('fast', function () {
-                    $('#title').html("Successfully saved quiz").fadeIn('fast');
-                })
+            $.ajax({
+                url: '/quiz/new',
+                type: "POST",
+                data: JSON.stringify(obj),
+                processData: false,
+                contentType: "application/json; charset=UTF-8"
             });
+
+            return false;
         });

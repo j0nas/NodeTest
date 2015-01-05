@@ -25,7 +25,7 @@ if loggedin
 
             window.operateEvents = {
                 'click .remove': function (e, value, row, index) {
-                    var type = (typeof row.author === 'undefined' ? 'users' : 'quiz');
+                    var type = (typeof row.quizname === 'undefined' ? 'users' : 'quiz');
                     $.post('/' + type + '/delete/' + row._id, function (data) {
                         console.log('Deleted ' + type + ' with id: ' + row._id);
                         $('#' + row._id).fadeOut();
@@ -38,7 +38,6 @@ if loggedin
             table#quiztable(data-url='/quiz', data-toggle='table')
                 thead
                     tr
-                        th(data-field="name") Name
+                        th(data-field="quizname") Name
                         th(data-field="author") Author
-                        th(data-field="questioncount") Questions
                         th(data-field="operate", data-formatter="operateFormatter" data-events="operateEvents") Operations

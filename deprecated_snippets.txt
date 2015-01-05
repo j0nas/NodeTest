@@ -1,0 +1,34 @@
+// createquiz.jade
+$('#finalize').fadeOut('fast');
+var quiz = {
+    name: $('#quizname').val(),
+    author: "",
+    questioncount: questionCount,
+    questions: []
+};
+
+for (var i = 0; i < questionCount; i++) {
+    quiz.questions.push(new {
+        text: $('#question_' + i).val(),
+        answers: []
+    });
+
+    for (j = 0; j < answerCount[i]; j++) { // TODO this was where null-indexzing was replaced
+        quiz.questions[i].answers.push(new {
+            text: $('#question_' + i + '_answer_' + j + ' > div > input').val(),
+            iscorrect: $('#question_' + i + '_answer_' + j + ' > div > span > input').prop('checked'),
+        });
+    }
+}
+
+console.log("Attempting to persist created quiz.");
+$.post('/quiz/new', quiz, function () {
+    $('#title').fadeOut('fast', function () {
+        $('#title').html("Successfully saved quiz").fadeIn('fast');
+    })
+});
+
+//sockets
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.foundation5.zurb.com/foundation.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>

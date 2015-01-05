@@ -10,7 +10,6 @@ var routes = require('./routes/index');
 
 var app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -140,17 +139,16 @@ app.post('/quiz/new', function (req, res, next) {
     var quiz = req.body;
     quiz.author = req.session.username;
 
-    console.log('Persisting quiz: ' + quiz);
-
     db.collection('quiz', function (err, collection) {
         collection.insert(quiz, {safe: true}, function (err, result) {
             if (err) {
+                console.log('Failed to persist quiz!');
                 res.send({'error': 'An error has occurred'});
                 return;
             }
 
             console.log("Successfully persisted quiz.");
-            res.status(200).end();
+            res.redirect('/');
         });
     });
 });
@@ -202,49 +200,6 @@ app.get("/quiz", function (req, res, next) {
     });
 });
 
-app.get('/quiznew', function (req, res, next) {
-    console.log("Accessing!");
-
-    db.collection('quiz', function (err, collection) {
-        collection.insert({
-            name: "testquiz",
-            author: "user",
-            questions: [{
-                text: "question one",
-                answers: [
-                    {
-                        text: "answer one",
-                        correct: false
-                    },
-                    {
-                        text: "answer two",
-                        correct: true
-                    }]
-            },
-                {
-                    text: "question twp",
-                    answers: [
-                        {
-                            text: "answer one",
-                            correct: true
-                        },
-                        {
-                            text: "answer two",
-                            correct: false
-                        }]
-                }]
-        }, {safe: true}, function (err, result) {
-            if (err) {
-                res.send({'error': 'An error has occurred'});
-                return;
-            }
-
-            console.log("Successfully persisted quiz.");
-            res.status(200).end();
-        });
-    });
-});
-
 app.get('/quiz/activate/:id', function (req, res, next) {
     db.collection('quiz', function (err, collection) {
         collection.findOne({
@@ -257,9 +212,9 @@ app.get('/quiz/activate/:id', function (req, res, next) {
 
             console.log('Successfully found quiz' + JSON.stringify(item));
             res.render('quiz', {
-                name: item.name,
+                name: item.quizname,
                 author: item.author,
-                questions: JSON.stringify(item.questions)
+                questions: item.questions // TODO fix JSON storing to DB
             });
         })
     });
