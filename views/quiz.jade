@@ -4,6 +4,19 @@ block jumbotroncontent
 
 block content
     h1= name
-    h5 By #{author}
-    p Questions:
-        span= questions
+    h6 By #{author}
+    br
+    h3 Question ##{questionnumber + 1}
+    div.panel.panel-default
+        div.panel-heading= question.text
+        div.list-group
+            each answer in question.answers
+                a.list-group-item(href='#', onClick='validateAnswer(this, ' + answer.correct + ');')= answer.text
+
+    script.
+        function validateAnswer(e, ans) { // Yes, of course it's problematic to validate answers on client-side. Yes, of course this is only temporary.
+            $(e).addClass(ans ? 'list-group-item-success' : 'list-group-item-danger');
+            setTimeout(function () {
+                location.reload();
+            }, 1000);
+        }

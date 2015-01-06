@@ -1,0 +1,26 @@
+extends layout
+block jumbotroncontent
+    h1 Available quizes
+block content
+    table#quiztable(data-url='/quiz', data-toggle='table')
+        thead
+            tr
+                th(data-field="_id") Id
+                th(data-field="quizname") Name
+                th(data-field="author") Author
+                th(data-field="operate", data-formatter="operateFormatter" data-events="operateEvents") Operations
+
+    script.
+        function operateFormatter(value, row, index) {
+            return [
+                '<a class="redirect" href="javascript:void(0)">',
+                'Start quiz',
+                '</a>'
+            ].join('');
+        }
+
+        window.operateEvents = {
+            'click .redirect': function (e, value, row, index) {
+                window.location = '/quiz/activate/' + row._id;
+            }
+        };

@@ -201,6 +201,11 @@ app.get("/quiz", function (req, res, next) {
 });
 
 app.get('/quiz/activate/:id', function (req, res, next) {
+    if (!req.session.loggedin) {
+        res.status(401).end();
+        return;
+    }
+
     db.collection('quiz', function (err, collection) {
         collection.findOne({
             '_id': new BSON.ObjectID(req.params.id)
@@ -210,11 +215,34 @@ app.get('/quiz/activate/:id', function (req, res, next) {
                 return;
             }
 
-            console.log('Successfully found quiz' + JSON.stringify(item));
+            if (!req.session.quiz || !req.session.quiz.active) {
+                req.session.quiz = {};
+                req.session.quiz.active = true;
+                req.session.quiz.id = item._id;
+                req.session.quiz.question = 0;
+            } else {
+                req.session.quiz.question++;
+
+                // If user has answered all questions
+                if ((req.session.quiz.question + 1) > item.questions.length) {
+                    req.session.quiz.active = false;
+                    res.render('quizdone', {
+                        message: 'Quiz done!',
+                        loggedin: true,
+                        username: req.session.username
+                    });
+                    // Probably also persist quiz performance stats..?
+                    return;
+                }
+            }
+
             res.render('quiz', {
                 name: item.quizname,
                 author: item.author,
-                questions: item.questions // TODO fix JSON storing to DB
+                question: item.questions[req.session.quiz.question],
+                questionnumber: req.session.quiz.question,
+                loggedin: true,
+                username: req.session.username
             });
         })
     });

@@ -30,6 +30,19 @@ router.get("/users/new", function (req, res, next) {
     });
 });
 
+router.get("/quiz/list", function (req, res, next) {
+    if (!req.session.loggedin) {
+        res.status(401).end();
+        return;
+    }
+
+    res.render('listquiz', {
+        title: 'Available quizzes',
+        loggedin: true,
+        username: req.session.username
+    });
+});
+
 router.get('/quiz/new', function (req, res, next) {
     if (!req.session.loggedin) {
         res.status(401).end();

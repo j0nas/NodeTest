@@ -20,7 +20,9 @@ block content
             a(href="/quiz/new") Create a new quiz
         li
             a(href="/quiz/") List available quizes
-        li &nbsp;
+        li
+            a(href="/quiz/list/") Pretty-list and offer available quizes
+        br
         li Login, logout
         li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
         li User sessions!
@@ -38,6 +40,9 @@ block content
         li 02.01@1431: Proper JSON formatting (json spaces = 4)
         li 02.01@1540: Tables @ admin CP - formatting and parsing using Bootstrap Table (WHICH IS AN AMAZING LIBRARY!)
         li 02.01@1613: Delete quizes and users from admin cp GUI!
+        li 05.01@0600: It. Finally. Works. NewQuiz JSON now being parsed correctly!
+        li 06.01@XXXX: Listing and offering quizes -> provide logged-in users ability to take quizes
+        li 06.01@XXXX: users taking quizes!
 
     h1 To-do
     ul
@@ -56,6 +61,14 @@ block content
         li Actually display 401 error messages
         li Users able to take quizes
         li navbar with links, dynamically loaded according to user privilege
+        li Validate quiz answers @ server
+        li Display results
+        li Persist user quiz stats (store stats @ user, not @ quiz)
+        li List user stats
+        li User profile page
+        li Implement session checking middleware, I beleve some serious refactoring is in order to amp up development efficiency
+        li Merge quiz.jade and quizdone.jade, use same logic for both but with different conditions
+        li See if you can merge other view files with conditional logic. Ideally, everything related to quizes should be in one view, ect?
 
 
     h1 NPM package dependencies
