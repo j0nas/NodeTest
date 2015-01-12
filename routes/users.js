@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-
 // ALL OPERATIONS FOR /users/* ROUTE
-module.exports = function (db) {
+module.exports = function (db, BSON) {
     router.get("/", function (req, res, next) {
         if (!req.session.loggedin) {
             res.status(401).end();

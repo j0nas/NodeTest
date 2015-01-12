@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-module.exports = function (db) {
+module.exports = function (db, BSON) {
     router.get("/list", function (req, res, next) {
         if (!req.session.loggedin) {
             res.status(401).end();

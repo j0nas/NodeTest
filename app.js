@@ -6,8 +6,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressSession = require('express-session')
 
-var routes = require('./routes/index');
-
 var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
@@ -28,6 +26,7 @@ app.use(expressSession({
     resave: true
 }));
 
+var routes = require('./routes/index');
 app.use('/', routes);
 
 var mongo = require('mongodb');
@@ -51,14 +50,14 @@ db.open(function (err, db) {
     });
 });
 
-var userroutes = require('./routes/users')(db);
-app.use('/users', userroutes);
+var userroutes = require('./routes/users')(db, BSON);
 // Set '/users' as base route for users.js
+app.use('/users', userroutes);
 
 
-var quizroutes = require('./routes/quiz')(db);
-app.use('/quiz', quizroutes);
+var quizroutes = require('./routes/quiz')(db, BSON);
 // Set '/quiz' as base route for quiz.js
+app.use('/quiz', quizroutes);
 
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -72,13 +71,10 @@ if (app.get('env') === 'development') {
         res.render('error', {
             message: err.message,
             error: err,
-
         });
     });
 }
 
-// production error handler
-// no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
@@ -86,5 +82,4 @@ app.use(function (err, req, res, next) {
         error: {}
     });
 });
-
 module.exports = app;
