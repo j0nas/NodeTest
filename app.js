@@ -12,6 +12,7 @@ var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.set('json spaces', 4);
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
@@ -28,7 +29,6 @@ app.use(expressSession({
 }));
 
 app.use('/', routes);
-app.set('json spaces', 4);
 
 var mongo = require('mongodb');
 var Server = mongo.Server;
@@ -51,214 +51,21 @@ db.open(function (err, db) {
     });
 });
 
-// POST ROUTES
-app.post('/users/login', function (req, res, next) {
-    if (req.session.loggedin) {
-        return;
-    }
+var userroutes = require('./routes/users')(db);
+app.use('/users', userroutes);
+// Set '/users' as base route for users.js
 
-    db.collection('users', function (err, collection) {
-        var passHash = require('password-hash');
-        collection.findOne({
-            'username': req.body.username
-        }, function (err, item) {
-            if (err || item == null || !passHash.verify(req.body.password, item.password)) {
-                res.status(401).end();
-                return;
-            }
 
-            console.log('Login successful for account: ' + JSON.stringify(item));
-            console.log('Session initiated.');
-            req.session.username = item.username;
-            req.session.loggedin = true;
-            res.send(item);
-        })
-    });
-})
+var quizroutes = require('./routes/quiz')(db);
+app.use('/quiz', quizroutes);
+// Set '/quiz' as base route for quiz.js
 
-app.post('/users/logout', function (req, res, next) {
-    if (req.session.loggedin) {
-        req.session.destroy();
-        console.log("Session destroyed.");
-    }
-
-    res.redirect(200, '/'); // TODO fix redirect to index when logging out
-});
-
-app.post('/users/create', function (req, res, next) {
-    if (typeof req.body == "undefined") {
-        return;
-    }
-
-    var passHash = require('password-hash');
-    var user = {
-        username: req.body.username,
-        password: passHash.generate(req.body.password)
-        // Saves password as SHA1-encryped string.
-    };
-
-    db.collection('users', function (err, collection) {
-        collection.insert(user, {safe: true}, function (err, result) {
-            if (err) {
-                res.send({'error': 'An error has occurred'});
-                return;
-            }
-
-            console.log("Successfully created user.");
-            res.status(200).end();
-        });
-    });
-});
-
-app.post('/users/delete/:id', function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    var id = req.params.id;
-    console.log('Deleting user: ' + id);
-    db.collection('users', function (err, collection) {
-        collection.remove({'_id': new BSON.ObjectID(id)}, {safe: true}, function (err, result) {
-            if (err) {
-                res.send({'error': 'An error has occurred - ' + err});
-            } else {
-                console.log('' + result + ' document(s) deleted');
-                res.send(req.body);
-            }
-        });
-    });
-});
-
-app.post('/quiz/new', function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    var quiz = req.body;
-    quiz.author = req.session.username;
-
-    db.collection('quiz', function (err, collection) {
-        collection.insert(quiz, {safe: true}, function (err, result) {
-            if (err) {
-                console.log('Failed to persist quiz!');
-                res.send({'error': 'An error has occurred'});
-                return;
-            }
-
-            console.log("Successfully persisted quiz.");
-            res.redirect('/');
-        });
-    });
-});
-
-app.post('/quiz/delete/:id', function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    var id = req.params.id;
-    console.log('Deleting quiz: ' + id);
-    db.collection('quiz', function (err, collection) {
-        collection.remove({'_id': new BSON.ObjectID(id)}, {safe: true}, function (err, result) {
-            if (err) {
-                res.send({'error': 'An error has occurred - ' + err});
-            } else {
-                console.log('' + result + ' document(s) deleted');
-                res.send(req.body);
-            }
-        });
-    });
-});
-
-// GET ROUTES
-app.get("/users", function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    db.collection('users', function (err, collection) {
-        collection.find().toArray(function (err, items) {
-            res.json(items);
-        });
-    });
-});
-
-app.get("/quiz", function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    db.collection('quiz', function (err, collection) {
-        collection.find().toArray(function (err, items) {
-            res.send(items);
-        });
-    });
-});
-
-app.get('/quiz/activate/:id', function (req, res, next) {
-    if (!req.session.loggedin) {
-        res.status(401).end();
-        return;
-    }
-
-    db.collection('quiz', function (err, collection) {
-        collection.findOne({
-            '_id': new BSON.ObjectID(req.params.id)
-        }, function (err, item) {
-            if (err || item == null) {
-                res.status(404).end();
-                return;
-            }
-
-            if (!req.session.quiz || !req.session.quiz.active) {
-                req.session.quiz = {};
-                req.session.quiz.active = true;
-                req.session.quiz.id = item._id;
-                req.session.quiz.question = 0;
-            } else {
-                req.session.quiz.question++;
-
-                // If user has answered all questions
-                if ((req.session.quiz.question + 1) > item.questions.length) {
-                    req.session.quiz.active = false;
-                    res.render('quizdone', {
-                        message: 'Quiz done!',
-                        loggedin: true,
-                        username: req.session.username
-                    });
-                    // Probably also persist quiz performance stats..?
-                    return;
-                }
-            }
-
-            res.render('quiz', {
-                name: item.quizname,
-                author: item.author,
-                question: item.questions[req.session.quiz.question],
-                questionnumber: req.session.quiz.question,
-                loggedin: true,
-                username: req.session.username
-            });
-        })
-    });
-});
-
-// catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);

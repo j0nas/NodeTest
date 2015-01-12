@@ -22,6 +22,8 @@ block content
             a(href="/quiz/") List available quizes
         li
             a(href="/quiz/list/") Pretty-list and offer available quizes
+        li
+            a(href="/quiz/activate/54aa168488854a9427034408") Take a quiz
         br
         li Login, logout
         li User passwords are stored and validated with SHA1 encryption (npm:password-hash)
@@ -43,6 +45,7 @@ block content
         li 05.01@0600: It. Finally. Works. NewQuiz JSON now being parsed correctly!
         li 06.01@XXXX: Listing and offering quizes -> provide logged-in users ability to take quizes
         li 06.01@XXXX: users taking quizes!
+        li 12.01@0822: Keeping a changelog here wasn't the best idea. Probably lots of changes/features not included here.
 
     h1 To-do
     ul
@@ -66,9 +69,10 @@ block content
         li Persist user quiz stats (store stats @ user, not @ quiz)
         li List user stats
         li User profile page
-        li Implement session checking middleware, I beleve some serious refactoring is in order to amp up development efficiency
+        li Implement session checking middleware, I believe some serious refactoring is in order to amp up development efficiency
         li Merge quiz.jade and quizdone.jade, use same logic for both but with different conditions
         li See if you can merge other view files with conditional logic. Ideally, everything related to quizes should be in one view, ect?
+        li Read up more on npm:router. Correct usages, middleware, ect.
 
 
     h1 NPM package dependencies
