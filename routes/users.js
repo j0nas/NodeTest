@@ -25,10 +25,6 @@ module.exports = function (db, BSON) {
     });
 
     router.post('/login', function (req, res, next) {
-        if (req.session.loggedin) {
-            return;
-        }
-
         db.collection('users', function (err, collection) {
             var passHash = require('password-hash');
             collection.findOne({
@@ -59,6 +55,7 @@ module.exports = function (db, BSON) {
 
     router.post('/create', function (req, res, next) {
         if (typeof req.body == "undefined") {
+            console.log('/create: Undefined body.');
             return;
         }
 

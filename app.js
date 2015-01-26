@@ -34,6 +34,7 @@ var Server = mongo.Server;
 var Db = mongo.Db;
 var BSON = mongo.BSONPure;
 
+// TODO port to mongoose
 var server = new Server('localhost', 27017, {auto_reconnect: true});
 db = new Db('userdb', server, {safe: false});
 db.open(function (err, db) {
