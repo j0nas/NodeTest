@@ -66,6 +66,10 @@ module.exports = function (db, BSON) {
             // Saves password as SHA1-encryped string.
         };
 
+        console.log(req.body);
+        console.log(user.username);
+        console.log(user.password);
+
         db.collection('users', function (err, collection) {
             collection.insert(user, {safe: true}, function (err, result) {
                 if (err) {
